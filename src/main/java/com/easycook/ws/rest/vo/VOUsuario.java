@@ -50,6 +50,4 @@ public class VOUsuario {
 	public void setCorreo(String correo) {
 		this.correo = correo;
 	}
-
-	
 }

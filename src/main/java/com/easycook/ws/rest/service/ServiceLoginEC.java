@@ -1,6 +1,8 @@
 package com.easycook.ws.rest.service;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -9,6 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.easycook.ws.rest.db.Conexion;
+import com.easycook.ws.rest.vo.VOReceta;
+import com.easycook.ws.rest.vo.VOTipoComida;
 import com.easycook.ws.rest.vo.VOUsuario;
 
 @Path("/EasyCook")
@@ -73,5 +77,60 @@ public class ServiceLoginEC {
 		}
 		
 		return user;
+	}
+	
+	@POST
+	@Path("/consTipoComida")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public List<VOTipoComida> consTipoComida(){
+		List<VOTipoComida> result = new ArrayList<VOTipoComida>();
+		try {
+				//crea una conexion con mariadb
+				conecta.Conectar();
+		        sentenciaSQL = conecta.getSentenciaSQL();
+		        
+				sentencia= "SELECT id_tipo, tipo_comida "
+		                + " FROM tipo_comida ";
+				
+				cdr = sentenciaSQL.executeQuery(sentencia);
+				while(cdr.next()){
+					result.add(new VOTipoComida(Integer.parseInt(cdr.getString("id_tipo")), cdr.getString("tipo_comida")));
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return result;		
+	}
+	
+	@POST
+	@Path("/consReceta")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public List<VOReceta> consReceta(VOReceta rec){
+		List<VOReceta> result = new ArrayList<VOReceta>();
+		try {
+				//crea una conexion con mariadb
+				conecta.Conectar();
+		        sentenciaSQL = conecta.getSentenciaSQL();
+		        
+				sentencia= "SELECT nombre_receta, modo_preparacion, " + 
+				" url_video, id_usuario, id_tipo, porciones, likes " +
+		        " FROM recetas " +
+				" WHERE nombre_receta LIKE '%" + rec.getNombre() + "%'";
+				
+				cdr = sentenciaSQL.executeQuery(sentencia);
+				while(cdr.next()){
+					VOReceta newRec = new VOReceta();
+					newRec.setNombre(cdr.getString("nombre_receta"));
+					newRec.setPreparacion(cdr.getString("modo_preparacion"));
+					result.add(newRec);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return result;		
 	}
 }

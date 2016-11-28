@@ -13,7 +13,7 @@ import java.sql.*;
  * @author 
  */
 public class Conexion {
-      private Connection conexion = null;
+    private Connection conexion = null;
     private Statement sentenciaSQL = null;
     
     public void Conectar(){
