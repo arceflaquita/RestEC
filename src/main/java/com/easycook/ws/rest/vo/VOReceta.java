@@ -1,6 +1,5 @@
 package com.easycook.ws.rest.vo;
 
-
 import java.util.List;
 
 public class VOReceta {
@@ -13,7 +12,7 @@ public class VOReceta {
 	private String preparacion;
 	private String url_video;
 	private List<VOIngrediente> ingredientes;
-	private List<VOImagen> imagenes;
+	//private List<VOImagen> imagenes;
 
 	public int getId() {
 		return id;
@@ -69,10 +68,10 @@ public class VOReceta {
 	public void setIngredientes(List<VOIngrediente> ingredientes) {
 		this.ingredientes = ingredientes;
 	}
-	public List<VOImagen> getImagenes() {
+	/*public List<VOImagen> getImagenes() {
 		return imagenes;
 	}
 	public void setImagenes(List<VOImagen> imagenes) {
 		this.imagenes = imagenes;
-	}
+	}*/
 }

@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.easycook.ws.rest.db.Conexion;
+import com.easycook.ws.rest.vo.VOIngrediente;
 import com.easycook.ws.rest.vo.VOReceta;
 import com.easycook.ws.rest.vo.VOTipoComida;
 import com.easycook.ws.rest.vo.VOUsuario;
@@ -132,5 +133,40 @@ public class ServiceLoginEC {
 				e.printStackTrace();
 			}
 		return result;		
+	}
+	
+	@POST
+	@Path("/nuevaReceta")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public VOReceta nuevaReceta(VOReceta receta){
+		if(receta.getId_usuario() == 0) receta.setId_usuario(1);
+		sentencia = "INSERT INTO recetas (nombre_receta, modo_preparacion, url_video, fecha_registro, id_usuario, id_tipo, porciones) " + 
+		" VALUES ('"+receta.getNombre()+"', '"+receta.getPreparacion()+"', '"+receta.getUrl_video()+"', now(), "+receta.getId_usuario()+", "
+		 		+ receta.getTipo_comida()+", "+receta.getPorciones()+");";	    
+		try {
+			//crea una conexion con mariadb
+			conecta.Conectar();
+	        sentenciaSQL = conecta.getSentenciaSQL();	        
+			sentenciaSQL.executeUpdate(sentencia);
+			int receta_id = 0;
+			sentencia = "SELECT max(id_receta) as id_receta FROM recetas";       
+			cdr = sentenciaSQL.executeQuery(sentencia);
+			if(cdr.first()){
+				receta_id = Integer.parseInt(cdr.getString("id_receta"));
+			}
+			if(receta_id > 0){
+				for(VOIngrediente ing: receta.getIngredientes()){
+					sentencia = "INSERT INTO receta_ingredientes (id_receta, nombre_ingrediente) values ("+
+								receta_id + ", '" + ing.getNombre()+ "')"; 
+					sentenciaSQL.executeUpdate(sentencia);
+				}
+			}			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();	
+			return receta;
+		}		
+		return receta;
 	}
 }
