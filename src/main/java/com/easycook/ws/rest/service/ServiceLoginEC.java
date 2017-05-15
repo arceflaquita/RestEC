@@ -29,7 +29,7 @@ public class ServiceLoginEC {
     Conexion conecta = new Conexion();;
     String sentencia = "";
 	
-	@POST
+    @POST
 	@Path("/validaUsuario")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
@@ -37,28 +37,36 @@ public class ServiceLoginEC {
 		user.setUserValido(false);
 		
 		try {
-				//crea una conexion con mariadb
-				conecta.Conectar();
-		        sentenciaSQL = conecta.getSentenciaSQL();
-		        
-				sentencia= "SELECT correo, contrasenia "
-		                + " FROM usuarios "
-	                + " WHERE correo = '" + user.getCorreo() + "'"
-	                + " AND contrasenia = '" + user.getPassword() + "'";
+			//crea una conexion con mariadb
+			conecta.Conectar();
+	        sentenciaSQL = conecta.getSentenciaSQL();
+	        
+			sentencia= "SELECT correo, contrasenia "
+	                + " FROM usuarios "
+                + " WHERE correo = '" + user.getCorreo() + "'";
+       //         + " AND contrasenia = '" + user.getPassword() + "'";
 
 
-				cdr = sentenciaSQL.executeQuery(sentencia);
-				if(cdr.first()){
-					if(user.getCorreo().equals(cdr.getString("correo")) && user.getPassword().equals(cdr.getString("contrasenia"))){
-						user.setUserValido(true);
-					}
+			cdr = sentenciaSQL.executeQuery(sentencia);
+			if(cdr.first()){
+				if(user.getCorreo().equals(cdr.getString("correo")) && user.getPassword().equals(cdr.getString("contrasenia"))){
+					user.setUserValido(true);
+					
+					
 				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				if(user.getCorreo().equals(cdr.getString("correo"))){
+					user.setCorreoIgual(true);
+				}
 			}
-		return user;		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	return user;		
+
+
 	}
+
 
 	@POST
 	@Path("/nuevoUsuario")

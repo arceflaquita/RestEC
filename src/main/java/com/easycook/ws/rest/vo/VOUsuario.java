@@ -8,6 +8,21 @@ public class VOUsuario {
 	private String ap_paterno;
 	private String ap_materno;
 	private String correo;
+	private boolean correoIgual;
+	private boolean passwordIgual;
+	
+	public boolean isPasswordIgual() {
+		return passwordIgual;
+	}
+	public void setPasswordIgual(boolean passwordIgual) {
+		this.passwordIgual = passwordIgual;
+	}
+	public boolean isCorreoIgual() {
+		return correoIgual;
+	}
+	public void setCorreoIgual(boolean correoIgual) {
+		this.correoIgual = correoIgual;
+	}
 	public String getUsuario() {
 		return usuario;
 	}
