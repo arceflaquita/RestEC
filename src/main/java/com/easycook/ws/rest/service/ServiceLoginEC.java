@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -151,8 +152,7 @@ public class ServiceLoginEC {
 
     public byte[] decodeBase64(String input)
     {
-    	Decoder dec = Base64.getDecoder();
-        byte[] decodedBytes = dec.decode(input);
+        byte[] decodedBytes = Base64.getMimeDecoder().decode(input);
         return decodedBytes;
     }
 	
@@ -166,20 +166,6 @@ public class ServiceLoginEC {
 		" VALUES ('"+receta.getNombre()+"', '"+receta.getPreparacion()+"', '"+receta.getUrl_video()+"', now(), "+receta.getId_usuario()+", "
 		 		+ receta.getTipo_comida()+", "+receta.getPorciones()+");";	    
 		try {
-			
-			byte[] ba = decodeBase64(receta.getImage());
-			try{
-				FileOutputStream fos = new FileOutputStream("C:\\tmp\\image.jpg");
-				try {
-				    fos.write(ba);
-				}				
-				finally {
-				    fos.close();
-				}
-			}
-			catch (IOException io){				
-			}
-			
 			//crea una conexion con mariadb
 			conecta.Conectar();
 	        sentenciaSQL = conecta.getSentenciaSQL();	        
@@ -191,6 +177,18 @@ public class ServiceLoginEC {
 				receta_id = Integer.parseInt(cdr.getString("id_receta"));
 			}
 			if(receta_id > 0){
+				byte[] ba = decodeBase64(receta.getImage());
+				try{
+					FileOutputStream fos = new FileOutputStream("C:\\Users\\color\\workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
+					try {
+					    fos.write(ba);
+					}				
+					finally {
+					    fos.close();
+					}
+				}
+				catch (IOException io){				
+				}				
 				for(VOIngrediente ing: receta.getIngredientes()){
 					sentencia = "INSERT INTO receta_ingredientes (id_receta, nombre_ingrediente) values ("+
 								receta_id + ", '" + ing.getNombre()+ "')"; 
