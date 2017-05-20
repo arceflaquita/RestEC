@@ -1,6 +1,7 @@
 package com.easycook.ws.rest.vo;
 
 public class VOUsuario {
+	private int idUsuario;
 	private String usuario;
 	private String password;
 	private boolean userValido;
@@ -11,6 +12,13 @@ public class VOUsuario {
 	private boolean correoIgual;
 	private boolean passwordIgual;
 	
+	
+	public int getIdUsuario() {
+		return idUsuario;
+	}
+	public void setIdUsuario(int idUsuario) {
+		this.idUsuario = idUsuario;
+	}
 	public boolean isPasswordIgual() {
 		return passwordIgual;
 	}

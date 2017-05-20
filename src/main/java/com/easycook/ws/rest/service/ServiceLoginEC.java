@@ -42,7 +42,7 @@ public class ServiceLoginEC {
 			conecta.Conectar();
 	        sentenciaSQL = conecta.getSentenciaSQL();
 	        
-			sentencia= "SELECT correo, contrasenia "
+			sentencia= "SELECT correo, contrasenia ,id_usuario"
 	                + " FROM usuarios "
                 + " WHERE correo = '" + user.getCorreo() + "'";
        //         + " AND contrasenia = '" + user.getPassword() + "'";
@@ -58,6 +58,7 @@ public class ServiceLoginEC {
 				if(user.getCorreo().equals(cdr.getString("correo"))){
 					user.setCorreoIgual(true);
 				}
+				user.setIdUsuario(cdr.getInt(3));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -202,4 +203,95 @@ public class ServiceLoginEC {
 		}		
 		return receta;
 	}
+	
+	
+
+	@POST
+	@Path("/consultaEspecifca")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public  List<VOReceta> consaEspecifica(VOReceta receta){
+		List<VOReceta> result = new ArrayList<VOReceta>();
+		try {
+			String nomReceta="nombre_ingrediente=";
+			String ConsultaBD="nombre_ingrediente= ";
+			String complemento=" || ";
+			int contador=1;
+			if(receta.getIngredientes().size()==1){
+				for(VOIngrediente ing: receta.getIngredientes()){
+					ConsultaBD+=" '"+ing.getNombre()+"' ";
+					System.out.println("sentencia SQL:  "+ConsultaBD);
+						
+					}
+			}else{
+				for(VOIngrediente ing: receta.getIngredientes()){
+					if(contador==receta.getIngredientes().size()){
+						ConsultaBD+=" '"+ing.getNombre()+"' " ;
+					}else{
+						ConsultaBD+=" '"+ing.getNombre()+"' "+complemento+nomReceta ;
+					}
+					
+					System.out.println("sentencia SQL:  "+ConsultaBD);
+						
+						contador+=1;
+					}
+			}
+					//crea una conexion con mariadb
+					conecta.Conectar();
+			        sentenciaSQL = conecta.getSentenciaSQL();
+			        
+					sentencia= "select receta_ingredientes.id_receta , nombre_receta from receta_ingredientes "+
+					           " inner join recetas on receta_ingredientes.id_receta=recetas.id_receta"+
+							   " where "+ConsultaBD;
+					System.out.println("sentencia SQL:  "+sentencia);
+					
+					cdr = sentenciaSQL.executeQuery(sentencia);
+					while(cdr.next()){
+						VOReceta newRec = new VOReceta();
+						newRec.setId(cdr.getInt(1));
+						newRec.setNombre(cdr.getString(2));
+						result.add(newRec);
+					}
+				System.out.println("lista: "+result.toString());
+				
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;	
+	}
+	
+	@POST
+	@Path("/consRecetaTipo")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public List<VOReceta> consRecetaTipo(VOReceta rec){
+		List<VOReceta> result = new ArrayList<VOReceta>();
+		try {
+				//crea una conexion con mariadb
+				conecta.Conectar();
+		        sentenciaSQL = conecta.getSentenciaSQL();
+		        
+				sentencia= "SELECT id_receta,nombre_receta " +
+		        " FROM recetas " +
+				" WHERE id_tipo="+rec.getTipo_comida();
+				
+				cdr = sentenciaSQL.executeQuery(sentencia);
+				while(cdr.next()){
+					VOReceta newRec = new VOReceta();
+					newRec.setId(cdr.getInt(1));
+					newRec.setNombre(cdr.getString("nombre_receta"));
+					result.add(newRec);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return result;		
+		
+	}
+  
+	
 }
