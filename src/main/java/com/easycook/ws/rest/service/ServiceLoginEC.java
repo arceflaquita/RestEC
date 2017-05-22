@@ -236,27 +236,23 @@ public class ServiceLoginEC {
 						contador+=1;
 					}
 			}
-					//crea una conexion con mariadb
-					conecta.Conectar();
-			        sentenciaSQL = conecta.getSentenciaSQL();
-			        
-					sentencia= "select receta_ingredientes.id_receta , nombre_receta from receta_ingredientes "+
-					           " inner join recetas on receta_ingredientes.id_receta=recetas.id_receta"+
-							   " where "+ConsultaBD;
-					System.out.println("sentencia SQL:  "+sentencia);
-					
-					cdr = sentenciaSQL.executeQuery(sentencia);
-					while(cdr.next()){
-						VOReceta newRec = new VOReceta();
-						newRec.setId(cdr.getInt(1));
-						newRec.setNombre(cdr.getString(2));
-						result.add(newRec);
-					}
-				System.out.println("lista: "+result.toString());
-				
+			//crea una conexion con mariadb
+			conecta.Conectar();
+	        sentenciaSQL = conecta.getSentenciaSQL();
+	        
+			sentencia= "select receta_ingredientes.id_receta , nombre_receta from receta_ingredientes "+
+			           " inner join recetas on receta_ingredientes.id_receta=recetas.id_receta"+
+					   " where "+ConsultaBD;
+			System.out.println("sentencia SQL:  "+sentencia);
 			
-			
-			
+			cdr = sentenciaSQL.executeQuery(sentencia);
+			while(cdr.next()){
+				VOReceta newRec = new VOReceta();
+				newRec.setId(cdr.getInt(1));
+				newRec.setNombre(cdr.getString(2));
+				result.add(newRec);
+			}
+			System.out.println("lista: "+result.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -270,28 +266,99 @@ public class ServiceLoginEC {
 	public List<VOReceta> consRecetaTipo(VOReceta rec){
 		List<VOReceta> result = new ArrayList<VOReceta>();
 		try {
-				//crea una conexion con mariadb
-				conecta.Conectar();
-		        sentenciaSQL = conecta.getSentenciaSQL();
-		        
-				sentencia= "SELECT id_receta,nombre_receta " +
-		        " FROM recetas " +
-				" WHERE id_tipo="+rec.getTipo_comida();
-				
-				cdr = sentenciaSQL.executeQuery(sentencia);
-				while(cdr.next()){
-					VOReceta newRec = new VOReceta();
-					newRec.setId(cdr.getInt(1));
-					newRec.setNombre(cdr.getString("nombre_receta"));
-					result.add(newRec);
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			//crea una conexion con mariadb
+			conecta.Conectar();
+	        sentenciaSQL = conecta.getSentenciaSQL();
+	        
+			sentencia= "SELECT id_receta,nombre_receta " +
+	        " FROM recetas " +
+			" WHERE id_tipo="+rec.getTipo_comida();
+			
+			cdr = sentenciaSQL.executeQuery(sentencia);
+			while(cdr.next()){
+				VOReceta newRec = new VOReceta();
+				newRec.setId(cdr.getInt(1));
+				newRec.setNombre(cdr.getString("nombre_receta"));
+				result.add(newRec);
 			}
-		return result;		
-		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;	
 	}
-  
 	
+	@POST
+	@Path("/listarRecetas")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public List<VOReceta> listarRecetas(){
+		List<VOReceta> result = new ArrayList<VOReceta>();
+		try {
+			//crea una conexion con mariadb
+			conecta.Conectar();
+	        sentenciaSQL = conecta.getSentenciaSQL();
+	        
+			sentencia = "SELECT id_receta, nombre_receta FROM recetas";
+			
+			cdr = sentenciaSQL.executeQuery(sentencia);
+			while(cdr.next()){
+				VOReceta newRec = new VOReceta();
+				newRec.setId(cdr.getInt("id_receta"));
+				newRec.setNombre(cdr.getString("nombre_receta"));
+				newRec.setImage("receta_" + cdr.getString("id_receta") + ".jpg");
+				result.add(newRec);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;	
+	}
+	
+	@POST
+	@Path("/recetaDetalle")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public VOReceta recetaDetalle(VOReceta rec){
+		VOReceta newRec = null;
+		try {
+			//crea una conexion con mariadb
+			conecta.Conectar();
+	        sentenciaSQL = conecta.getSentenciaSQL();
+	        
+			sentencia = "SELECT id_receta, nombre_receta, modo_preparacion, " +
+			" url_video, tipo_comida, porciones " +
+			" FROM recetas r " +
+			" INNER JOIN tipo_comida tc ON " + 
+			" r.id_tipo = tc.id_tipo " +
+			" where id_receta = " + rec.getId();
+			
+			cdr = sentenciaSQL.executeQuery(sentencia);			
+			if(cdr.first()){
+				newRec = new VOReceta();
+				newRec.setId(cdr.getInt("id_receta"));
+				newRec.setNombre(cdr.getString("nombre_receta"));
+				newRec.setImage("receta_" + cdr.getString("id_receta") + ".jpg");
+				newRec.setPreparacion(cdr.getString("modo_preparacion"));
+				newRec.setPorciones(Integer.parseInt(cdr.getString("porciones")));
+				newRec.setUrl_video(cdr.getString("url_video"));
+				newRec.setComida(cdr.getString("tipo_comida"));
+			}
+			
+			sentencia = "SELECT id_receta, nombre_ingrediente from receta_ingredientes " +
+					" where id_receta = " + rec.getId();
+			cdr = sentenciaSQL.executeQuery(sentencia);
+			List<VOIngrediente> ings = new ArrayList<VOIngrediente>();
+			while(cdr.next()){
+				ings.add(new VOIngrediente(cdr.getString("nombre_ingrediente")));
+			}
+			newRec.setIngredientes(ings);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return newRec;
+		}
+		return newRec;	
+	}
 }

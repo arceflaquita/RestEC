@@ -13,6 +13,7 @@ public class VOReceta {
 	private String url_video;
 	private List<VOIngrediente> ingredientes;
 	private String image;
+	private String comida;
 	//private List<VOImagen> imagenes;
 
 	public int getId() {
@@ -80,5 +81,11 @@ public class VOReceta {
 	}
 	public void setImage(String image) {
 		this.image = image;
+	}
+	public String getComida() {
+		return comida;
+	}
+	public void setComida(String comida) {
+		this.comida = comida;
 	}
 }
