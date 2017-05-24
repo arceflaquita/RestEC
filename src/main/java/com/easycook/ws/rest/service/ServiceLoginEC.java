@@ -132,7 +132,7 @@ public class ServiceLoginEC {
 				conecta.Conectar();
 		        sentenciaSQL = conecta.getSentenciaSQL();
 		        
-				sentencia= "SELECT nombre_receta, modo_preparacion, " + 
+				sentencia= "SELECT id_receta,nombre_receta, modo_preparacion, " + 
 				" url_video, id_usuario, id_tipo, porciones, likes " +
 		        " FROM recetas " +
 				" WHERE nombre_receta LIKE '%" + rec.getNombre() + "%'";
@@ -140,6 +140,7 @@ public class ServiceLoginEC {
 				cdr = sentenciaSQL.executeQuery(sentencia);
 				while(cdr.next()){
 					VOReceta newRec = new VOReceta();
+					newRec.setId(cdr.getInt("id_receta"));
 					newRec.setNombre(cdr.getString("nombre_receta"));
 					newRec.setPreparacion(cdr.getString("modo_preparacion"));
 					result.add(newRec);
@@ -180,7 +181,7 @@ public class ServiceLoginEC {
 			if(receta_id > 0){
 				byte[] ba = decodeBase64(receta.getImage());
 				try{
-					FileOutputStream fos = new FileOutputStream("C:\\Users\\color\\workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
+						FileOutputStream fos = new FileOutputStream("C:\\Users\\color\\workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
 					try {
 					    fos.write(ba);
 					}				
@@ -248,8 +249,9 @@ public class ServiceLoginEC {
 			cdr = sentenciaSQL.executeQuery(sentencia);
 			while(cdr.next()){
 				VOReceta newRec = new VOReceta();
-				newRec.setId(cdr.getInt(1));
-				newRec.setNombre(cdr.getString(2));
+				newRec.setId(cdr.getInt("id_receta"));
+				newRec.setNombre(cdr.getString("nombre_receta"));
+				newRec.setImage("receta_" + cdr.getString("id_receta") + ".jpg");
 				result.add(newRec);
 			}
 			System.out.println("lista: "+result.toString());
@@ -277,8 +279,9 @@ public class ServiceLoginEC {
 			cdr = sentenciaSQL.executeQuery(sentencia);
 			while(cdr.next()){
 				VOReceta newRec = new VOReceta();
-				newRec.setId(cdr.getInt(1));
+				newRec.setId(cdr.getInt("id_receta"));
 				newRec.setNombre(cdr.getString("nombre_receta"));
+				newRec.setImage("receta_" + cdr.getString("id_receta") + ".jpg");
 				result.add(newRec);
 			}
 		} catch (SQLException e) {
@@ -315,6 +318,7 @@ public class ServiceLoginEC {
 		}
 		return result;	
 	}
+	
 	
 	@POST
 	@Path("/recetaDetalle")
