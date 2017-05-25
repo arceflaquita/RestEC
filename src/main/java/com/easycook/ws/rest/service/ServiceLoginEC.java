@@ -141,6 +141,7 @@ public class ServiceLoginEC {
 				while(cdr.next()){
 					VOReceta newRec = new VOReceta();
 					newRec.setId(cdr.getInt("id_receta"));
+					newRec.setImage("receta_" + cdr.getString("id_receta") + ".jpg");
 					newRec.setNombre(cdr.getString("nombre_receta"));
 					newRec.setPreparacion(cdr.getString("modo_preparacion"));
 					result.add(newRec);
