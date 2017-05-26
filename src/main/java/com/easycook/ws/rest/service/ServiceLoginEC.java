@@ -182,7 +182,7 @@ public class ServiceLoginEC {
 			if(receta_id > 0){
 				byte[] ba = decodeBase64(receta.getImage());
 				try{
-						FileOutputStream fos = new FileOutputStream("C:\\Users\\color\\workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
+						FileOutputStream fos = new FileOutputStream("C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
 					try {
 					    fos.write(ba);
 					}				
@@ -366,4 +366,47 @@ public class ServiceLoginEC {
 		}
 		return newRec;	
 	}
+	
+	 @POST
+		@Path("/recuperarPassword")
+		@Consumes({MediaType.APPLICATION_JSON})
+		@Produces({MediaType.APPLICATION_JSON})
+		public VOUsuario recuperarPassword(VOUsuario user){
+			
+			
+			try {
+				//crea una conexion con mariadb
+				conecta.Conectar();
+		        sentenciaSQL = conecta.getSentenciaSQL();
+		        
+				sentencia= "SELECT contrasenia "
+		                + " FROM usuarios "
+	                + " WHERE correo = '" + user.getCorreo() + "'";
+	       //         + " AND contrasenia = '" + user.getPassword() + "'";
+
+
+				cdr = sentenciaSQL.executeQuery(sentencia);
+				if(cdr.first()){
+					
+					 String to =user.getCorreo();
+							 
+		                String subject = "Recuperaciòn de password";
+		                String message ="Su contraseña es: "+cdr.getString(1);
+		                
+		                String correo = "easycooklab@gmail.com";
+		                String pass = "vqprlchpjlqaxnkh";
+					
+					SendMail.send(to, subject, message, correo, pass);
+					
+				
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return user;		
+
+
+		}
+	
 }
