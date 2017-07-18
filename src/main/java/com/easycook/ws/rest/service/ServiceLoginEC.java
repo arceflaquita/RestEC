@@ -42,7 +42,7 @@ public class ServiceLoginEC {
 			conecta.Conectar();
 	        sentenciaSQL = conecta.getSentenciaSQL();
 	        
-			sentencia= "SELECT correo, contrasenia ,id_usuario"
+			sentencia= "SELECT correo, AES_DECRYPT(contrasenia,'yahooo'),id_usuario,nombre,ap_paterno,ap_materno"
 	                + " FROM usuarios "
                 + " WHERE correo = '" + user.getCorreo() + "'";
        //         + " AND contrasenia = '" + user.getPassword() + "'";
@@ -50,9 +50,11 @@ public class ServiceLoginEC {
 
 			cdr = sentenciaSQL.executeQuery(sentencia);
 			if(cdr.first()){
-				if(user.getCorreo().equals(cdr.getString("correo")) && user.getPassword().equals(cdr.getString("contrasenia"))){
+				if(user.getCorreo().equals(cdr.getString("correo")) && user.getPassword().equals(cdr.getString(2))){
 					user.setUserValido(true);
-					
+					user.setNombre(cdr.getString("nombre"));
+					user.setAp_paterno(cdr.getString("ap_paterno"));
+					user.setAp_materno(cdr.getString("ap_materno"));
 					
 				}
 				if(user.getCorreo().equals(cdr.getString("correo"))){
@@ -79,7 +81,7 @@ public class ServiceLoginEC {
 		
 		sentencia = "INSERT INTO usuarios (nombre, ap_paterno, ap_materno, correo, contrasenia, fecha_registro) " + 
 		" VALUES ('"+user.getNombre()+"', '"+user.getAp_paterno()+"', '"+user.getAp_materno()+"', '"+user.getCorreo()+"',"
-		 		+ " '"+user.getPassword()+"', now());";
+		 		+ " AES_ENCRYPT('"+user.getPassword()+"','yahooo'), now());";
 	    
 		try {
 			//crea una conexion con mariadb
@@ -215,22 +217,22 @@ public class ServiceLoginEC {
 	public  List<VOReceta> consaEspecifica(VOReceta receta){
 		List<VOReceta> result = new ArrayList<VOReceta>();
 		try {
-			String nomReceta="nombre_ingrediente=";
-			String ConsultaBD="nombre_ingrediente= ";
+			String nomReceta="nombre_ingrediente LIKE '%";
+			String ConsultaBD="nombre_ingrediente LIKE '%";
 			String complemento=" || ";
 			int contador=1;
 			if(receta.getIngredientes().size()==1){
 				for(VOIngrediente ing: receta.getIngredientes()){
-					ConsultaBD+=" '"+ing.getNombre()+"' ";
+					ConsultaBD+=ing.getNombre()+"%' ";
 					System.out.println("sentencia SQL:  "+ConsultaBD);
 						
 					}
 			}else{
 				for(VOIngrediente ing: receta.getIngredientes()){
 					if(contador==receta.getIngredientes().size()){
-						ConsultaBD+=" '"+ing.getNombre()+"' " ;
+						ConsultaBD+=" "+ing.getNombre()+"%' " ;
 					}else{
-						ConsultaBD+=" '"+ing.getNombre()+"' "+complemento+nomReceta ;
+						ConsultaBD+=" "+ing.getNombre()+"%' "+complemento+nomReceta ;
 					}
 					
 					System.out.println("sentencia SQL:  "+ConsultaBD);
@@ -244,7 +246,7 @@ public class ServiceLoginEC {
 	        
 			sentencia= "select receta_ingredientes.id_receta , nombre_receta from receta_ingredientes "+
 			           " inner join recetas on receta_ingredientes.id_receta=recetas.id_receta"+
-					   " where "+ConsultaBD;
+					   " where "+ConsultaBD+"group by receta_ingredientes.id_receta";
 			System.out.println("sentencia SQL:  "+sentencia);
 			
 			cdr = sentenciaSQL.executeQuery(sentencia);
@@ -379,7 +381,7 @@ public class ServiceLoginEC {
 				conecta.Conectar();
 		        sentenciaSQL = conecta.getSentenciaSQL();
 		        
-				sentencia= "SELECT contrasenia "
+				sentencia= "SELECT contrasenia,nombre,ap_paterno,ap_materno "
 		                + " FROM usuarios "
 	                + " WHERE correo = '" + user.getCorreo() + "'";
 	       //         + " AND contrasenia = '" + user.getPassword() + "'";
@@ -388,11 +390,16 @@ public class ServiceLoginEC {
 				cdr = sentenciaSQL.executeQuery(sentencia);
 				if(cdr.first()){
 					
-					 String to =user.getCorreo();
+					    String to =user.getCorreo();
 							 
 		                String subject = "Recuperaciòn de password";
-		                String message ="Su contraseña es: "+cdr.getString(1);
 		                
+		                String message ="Estimado "+cdr.getString(2)+" "+cdr.getString(3)+""
+		                		+ "Su contraseña es: "+cdr.getString(1);
+		                /* String message ="<html> <body><div style='border: 5px solid black;'><img src='http://127.0.0.1:8080/RestEC/images/easy.jpg' style=' width: 150px; margin-left: 50%;'/>"
+                		+"<h2>Estimado:"+cdr.getString(2)+" "+cdr.getString(3)+""+cdr.getString(4)+" </h2> </br> <h2>Su contraseña es :"+cdr.getString(1)+" </h2> </div> </body> </html> ";
+                		*/
+    		            
 		                String correo = "easycooklab@gmail.com";
 		                String pass = "vqprlchpjlqaxnkh";
 					

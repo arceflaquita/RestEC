@@ -7,15 +7,18 @@ import javax.mail.Session;
 import javax.mail.Message;
 import javax.mail.Transport;
 import javax.mail.Authenticator;
+import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 
 public class SendMail 
 {
-
+	 MimeMultipart multipart = new MimeMultipart("related");
     public static void send(String to, String sub,String msg, final String user,
             final String pass) 
     {
@@ -43,7 +46,9 @@ public class SendMail
             message.setRecipients(Message.RecipientType.TO, InternetAddress
                     .parse(to));
             message.setSubject(sub);
+           
             message.setText(msg);
+            
 
             Transport.send(message);
             
@@ -57,4 +62,5 @@ public class SendMail
         }
         
     }
+   
 }
