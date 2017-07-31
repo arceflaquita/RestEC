@@ -60,7 +60,7 @@ public class ServiceLoginEC {
 				if(user.getCorreo().equals(cdr.getString("correo"))){
 					user.setCorreoIgual(true);
 				}
-				user.setIdUsuario(cdr.getInt(3));
+				user.setIdUsuario(cdr.getInt("id_usuario"));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -360,6 +360,18 @@ public class ServiceLoginEC {
 			while(cdr.next()){
 				ings.add(new VOIngrediente(cdr.getString("nombre_ingrediente")));
 			}
+			
+			sentencia="SELECT id_usuario from recetas_favoritas "
+					+ " where id_usuario="+rec.getId_usuario()+"&& id_receta="+rec.getId()+"";
+			cdr = sentenciaSQL.executeQuery(sentencia);	
+			if (cdr.next()) {
+				
+					newRec.setFavoritaUser(true);
+				}else{
+					newRec.setFavoritaUser(false);
+				}
+				
+			
 			newRec.setIngredientes(ings);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -415,5 +427,57 @@ public class ServiceLoginEC {
 
 
 		}
+	 
+		@POST
+		@Path("/recetasUser")
+		@Consumes({MediaType.APPLICATION_JSON})
+		@Produces({MediaType.APPLICATION_JSON})
+		public List<VOReceta> recetasFavoritaUser(VOReceta rec){
+			List<VOReceta> result = new ArrayList<VOReceta>();
+			try {
+				//crea una conexion con mariadb
+				conecta.Conectar();
+		        sentenciaSQL = conecta.getSentenciaSQL();
+		        
+				sentencia= "SELECT id_receta,nombre_receta " +
+		        " FROM recetas " +
+				" WHERE id_receta in(select id_receta from recetas_favoritas where id_usuario="+rec.getId_usuario()+");";
+				
+				cdr = sentenciaSQL.executeQuery(sentencia);
+				while(cdr.next()){
+					VOReceta newRec = new VOReceta();
+					newRec.setId(cdr.getInt("id_receta"));
+					newRec.setNombre(cdr.getString("nombre_receta"));
+					newRec.setImage("receta_" + cdr.getString("id_receta") + ".jpg");
+					result.add(newRec);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return result;	
+		}
 	
+		
+		@POST
+		@Path("/agregarFavorita")
+		@Consumes({MediaType.APPLICATION_JSON})
+		@Produces({MediaType.APPLICATION_JSON})
+		public VOReceta agregarFavorita(VOReceta receta){
+			if(receta.getId_usuario() == 0) receta.setId_usuario(1);
+			sentencia = "INSERT INTO `recetas_favoritas`(`id_usuario`, `id_receta`) VALUES ("+receta.getId_usuario()+","+receta.getId()+")";    
+			try {
+				//crea una conexion con mariadb
+				conecta.Conectar();
+		        sentenciaSQL = conecta.getSentenciaSQL();	        
+				sentenciaSQL.executeUpdate(sentencia);
+				receta.setFavoritaUser(true);
+					
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();	
+				return receta;
+			}		
+			return receta;
+		}
 }

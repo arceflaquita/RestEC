@@ -14,8 +14,16 @@ public class VOReceta {
 	private List<VOIngrediente> ingredientes;
 	private String image;
 	private String comida;
+	private boolean favoritaUser;
+	
 	//private List<VOImagen> imagenes;
 
+	public boolean isFavoritaUser() {
+		return favoritaUser;
+	}
+	public void setFavoritaUser(boolean favoritaUser) {
+		this.favoritaUser = favoritaUser;
+	}
 	public int getId() {
 		return id;
 	}
