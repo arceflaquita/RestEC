@@ -55,4 +55,3 @@ public class Conexion {
             return sentenciaSQL;
         }
 }
-

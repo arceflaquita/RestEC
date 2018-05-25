@@ -1,7 +1,6 @@
 package com.easycook.ws.rest.service;
 
 
-
 import java.util.Properties;
 import javax.mail.Session;
 import javax.mail.Message;

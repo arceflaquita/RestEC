@@ -1,5 +1,6 @@
 package com.easycook.ws.rest.service;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,7 +28,7 @@ import com.easycook.ws.rest.vo.VOUsuario;
 public class ServiceLoginEC {
 	ResultSet cdr = null;
     Statement sentenciaSQL=null;
-    Conexion conecta = new Conexion();;
+    Conexion conecta = new Conexion();
     String sentencia = "";
 	
     @POST
@@ -42,24 +43,35 @@ public class ServiceLoginEC {
 			conecta.Conectar();
 	        sentenciaSQL = conecta.getSentenciaSQL();
 	        
+	        /*
 			sentencia= "SELECT correo, AES_DECRYPT(contrasenia,'yahooo'),id_usuario,nombre,ap_paterno,ap_materno"
 	                + " FROM usuarios "
                 + " WHERE correo = '" + user.getCorreo() + "'";
        //         + " AND contrasenia = '" + user.getPassword() + "'";
+        
+        */
+	        sentencia= "SELECT correo, AES_DECRYPT(contrasenia,'yahooo'),id_usuario,nombre,ap_paterno,ap_materno"
+	                + " FROM usuarios "
+                + " WHERE correo = '" + user.getCorreo() + "'"
+	        	+ " AND contrasenia = '" + user.getPassword() + "'";
 
 
 			cdr = sentenciaSQL.executeQuery(sentencia);
 			if(cdr.first()){
-				if(user.getCorreo().equals(cdr.getString("correo")) && user.getPassword().equals(cdr.getString(2))){
+				/*if(user.getCorreo().equals(cdr.getString("correo")) && user.getPassword().equals(cdr.getString(2))){
 					user.setUserValido(true);
 					user.setNombre(cdr.getString("nombre"));
 					user.setAp_paterno(cdr.getString("ap_paterno"));
-					user.setAp_materno(cdr.getString("ap_materno"));
-					
+					user.setAp_materno(cdr.getString("ap_materno"));					
 				}
 				if(user.getCorreo().equals(cdr.getString("correo"))){
 					user.setCorreoIgual(true);
-				}
+				}*/
+				user.setUserValido(true);
+				user.setNombre(cdr.getString("nombre"));
+				user.setAp_paterno(cdr.getString("ap_paterno"));
+				user.setAp_materno(cdr.getString("ap_materno"));
+				user.setCorreoIgual(true);				
 				user.setIdUsuario(cdr.getInt("id_usuario"));
 			}
 		} catch (SQLException e) {
@@ -184,7 +196,7 @@ public class ServiceLoginEC {
 			if(receta_id > 0){
 				byte[] ba = decodeBase64(receta.getImage());
 				try{
-						FileOutputStream fos = new FileOutputStream("C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
+						FileOutputStream fos = new FileOutputStream("C:\\apache\\apache-tomcat-9.0.8\\webapps\\RestEC\\images\\receta_" + String.valueOf(receta_id) + ".jpg");
 					try {
 					    fos.write(ba);
 					}				
@@ -243,9 +255,9 @@ public class ServiceLoginEC {
 			//crea una conexion con mariadb
 			conecta.Conectar();
 	        sentenciaSQL = conecta.getSentenciaSQL();
-	        
+	        //" inner join ingredientes on receta_ingredientes.id_ingrediente = ingredientes.id_ingrediente"+
 			sentencia= "select receta_ingredientes.id_receta , nombre_receta from receta_ingredientes "+
-			           " inner join recetas on receta_ingredientes.id_receta=recetas.id_receta"+
+			           " inner join recetas on receta_ingredientes.id_receta=recetas.id_receta"+					   
 					   " where "+ConsultaBD+"group by receta_ingredientes.id_receta";
 			System.out.println("sentencia SQL:  "+sentencia);
 			
