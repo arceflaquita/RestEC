@@ -1,0 +1,74 @@
+base de datos easy-cook
+servicio
+http://localhost:8080/RestEC/services/EasyCook/consReceta
+
+https://www.youtube.com/watch?v=
+
+create database easycook;
+use easycook;
+
+create table usuarios(id_usuario int(10) not null auto_increment primary key,
+nombre varchar(50),
+ap_paterno varchar(100),
+ap_materno varchar(100),
+correo varchar(100),
+contrasenia varchar(50),
+fecha_registro date)engine=innodb;
+
+create table tipo_comida(
+id_tipo int(10) not null auto_increment primary key, 
+tipo_comida varchar(50))engine=innodb;
+
+create table recetas(id_receta int(10) not null auto_increment primary key,
+nombre_receta varchar(100),
+modo_preparacion varchar(1024),
+url_video varchar(100),
+likes int(5),
+fecha_registro date,
+id_usuario int(10),
+id_tipo int(10),
+porciones int(3),
+FOREIGN key (id_usuario) references usuarios(id_usuario),
+FOREIGN  key (id_tipo) references tipo_comida(id_tipo))engine=innodb;
+
+create table receta_ingredientes(id_receta_ingre int(10) not null auto_increment primary key,
+id_receta int(10),
+nombre_ingrediente varchar(512),
+foreign key (id_receta) references recetas(id_receta))engine=innodb;
+
+create table imagenes(id_imagen int(10) not null auto_increment primary key,
+nombre_imagen varchar(100),
+id_receta int(10),
+foreign key(id_receta) references recetas(id_receta))engine=innodb;
+
+create table comentarios(id_comentario int(10) not null auto_increment primary key,
+id_google varchar(50) not null,
+id_facebook varchar(50) not null,
+id_twiter varchar(50) not null,
+comentario varchar(1024),
+fecha_registro date,
+id_usuario int(10),
+foreign key (id_usuario) references usuarios(id_usuario))engine=innodb;
+
+insert into usuarios(nombre, ap_paterno, ap_materno, correo, contrasenia, fecha_registro) values("lupita","arce", "zahuantitla","lu","12",now());
+
+insert into tipo_comida(tipo_comida) values ('desayuno');
+insert into tipo_comida(tipo_comida) values ('comida');
+insert into tipo_comida(tipo_comida) values ('cena');
+insert into tipo_comida(tipo_comida) values ('cena romantica');
+
+insert into recetas(nombre_receta, modo_preparacion, url_video, id_usuario, id_tipo, porciones, likes, fecha_registro)
+values ('chicharron en salsa verde', 'bla bla bla', 'https://www.youtube.com/watch?v=59slmRYhiJM', 1, 2, 4, 0, now());
+
+insert into recetas(nombre_receta, modo_preparacion, url_video, id_usuario, id_tipo, porciones, likes, fecha_registro)
+values ('pollo poblano', 'bla bla bla', 'https://www.youtube.com/watch?v=881x4Vu-ktk', 1, 2, 4, 0, now());
+
+insert into recetas(nombre_receta, modo_preparacion, url_video, id_usuario, id_tipo, porciones, likes, fecha_registro)
+values ('pavo navideño relleno', 'bla bla bla', 'https://www.youtube.com/watch?v=J_HIUWRlMZI', 1, 2, 4, 0, now());
+
+easycook-150904
+key=AIzaSyC83ctBM8zQz4tEH0RPboDnR9qkWH1LCZA
+
+https://www.googleapis.com/youtube/v3/search?part=id&key=AIzaSyC83ctBM8zQz4tEH0RPboDnR9qkWH1LCZA&maxResults=1&q=pollo%20poblano
+
+https://www.youtube.com/watch?v=881x4Vu-ktk
